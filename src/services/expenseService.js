@@ -1,25 +1,23 @@
-const Expense = require('../models/Expense');
+const Expense = require("../models/expenseModel");
 
 class ExpenseService {
-  async createExpense(userId, expenseData) {
-    const expense = await Expense.create({ ...expenseData, user: userId });
-    return expense;
+  async getAllExpenses(userId) {
+    return await Expense.find({ user: userId });
   }
 
-  async getExpenses(userId) {
-    const expenses = await Expense.find({ user: userId });
-    return expenses;
+  async createExpense(expenseData) {
+    const expense = new Expense(expenseData);
+    return await expense.save();
   }
 
-  async updateExpense(id, userId, expenseData) {
-    const expense = await Expense.findOneAndUpdate({ _id: id, user: userId }, expenseData, { new: true });
-    if (!expense) throw new Error('Expense not found');
-    return expense;
+  async updateExpense(expenseId, updateData) {
+    return await Expense.findByIdAndUpdate(expenseId, updateData, {
+      new: true,
+    });
   }
 
-  async deleteExpense(id, userId) {
-    const expense = await Expense.findOneAndDelete({ _id: id, user: userId });
-    if (!expense) throw new Error('Expense not found');
+  async deleteExpense(expenseId) {
+    return await Expense.findByIdAndDelete(expenseId);
   }
 }
 

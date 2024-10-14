@@ -1,10 +1,12 @@
-const Joi = require("joi");
+const { body, param } = require("express-validator");
 
-const expenseSchema = Joi.object({
-  title: Joi.string().required(),
-  amount: Joi.number().positive().required(),
-  category: Joi.string().required(),
-  date: Joi.date().required(),
-});
+exports.expenseValidation = [
+  body("title").notEmpty().withMessage("Title is required"),
+  body("amount").isNumeric().withMessage("Amount must be a number"),
+  body("category").notEmpty().withMessage("Category is required"),
+  body("date").isDate().withMessage("Invalid date format"),
+];
 
-module.exports = { expenseSchema };
+exports.expenseIdValidation = [
+  param("id").isMongoId().withMessage("Invalid expense ID"),
+];

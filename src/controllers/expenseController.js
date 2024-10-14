@@ -1,43 +1,49 @@
-const ExpenseService = require("../services/expenseService");
+const expenseService = require("../services/expenseService");
 
 class ExpenseController {
-  async createExpense(req, res) {
+  async getAllExpenses(req, res) {
     try {
-      const expense = await ExpenseService.createExpense(req.user.id, req.body);
-      res.status(201).json(expense);
+      const expenses = await expenseService.getAllExpenses(req.user.id);
+      res.status(200).json(expenses);
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
-  async getExpenses(req, res) {
+  async createExpense(req, res) {
     try {
-      const expenses = await ExpenseService.getExpenses(req.user.id);
-      res.status(200).json(expenses);
+      const expenseData = { ...req.body, user: req.user.id };
+      const expense = await expenseService.createExpense(expenseData);
+      res.status(201).json(expense);
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ error: error.message });
     }
   }
 
   async updateExpense(req, res) {
     try {
-      const expense = await ExpenseService.updateExpense(
+      const updatedExpense = await expenseService.updateExpense(
         req.params.id,
-        req.user.id,
         req.body
       );
-      res.status(200).json(expense);
+      if (!updatedExpense) {
+        return res.status(404).json({ error: "Expense not found" });
+      }
+      res.status(200).json(updatedExpense);
     } catch (error) {
-      res.status(404).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
   async deleteExpense(req, res) {
     try {
-      await ExpenseService.deleteExpense(req.params.id, req.user.id);
+      const deletedExpense = await expenseService.deleteExpense(req.params.id);
+      if (!deletedExpense) {
+        return res.status(404).json({ error: "Expense not found" });
+      }
       res.status(204).send();
     } catch (error) {
-      res.status(404).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 }
